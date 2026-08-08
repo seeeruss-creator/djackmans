@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">D'Jackman placeholder image</title>
+  <desc id="desc">A warm-toned tailoring-themed placeholder illustration.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f2e4c7" />
+      <stop offset="100%" stop-color="#c89a47" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#1a1a1a" />
+      <stop offset="100%" stop-color="#3a2c14" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)" />
+  <circle cx="960" cy="140" r="260" fill="#fff7e8" opacity="0.55" />
+  <circle cx="180" cy="650" r="200" fill="#1a1a1a" opacity="0.08" />
+  <path d="M250 560c120-170 230-270 330-300 77-24 154-3 227 58 63 52 129 86 193 99v170H250Z" fill="#fffaf2" opacity="0.7" />
+  <path d="M362 514c58-88 124-147 198-177 36-14 73-15 111-3 43 14 91 52 145 114" fill="none" stroke="url(#accent)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M574 220v300" stroke="#1a1a1a" stroke-width="16" stroke-linecap="round" stroke-dasharray="26 20" opacity="0.8" />
+  <path d="M574 220c0 22 18 40 40 40h70" fill="none" stroke="#1a1a1a" stroke-width="16" stroke-linecap="round" />
+  <path d="M846 184l24 24" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round" />
+  <path d="M885 145l24 24" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round" opacity="0.7" />
+</svg>
