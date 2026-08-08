@@ -169,4 +169,9 @@ Frontend runs on `http://localhost:5173`.
 - **Frontend:** React 19, Vite 8, React Router 7, Tailwind CSS 3, Axios
 - **Backend:** Node.js, Express, MySQL2, JWT, bcryptjs
 - **Fonts:** Playfair Display (serif display), Inter (sans)
-# djackmans
+
+## Deployment Notes
+
+If you deploy the frontend on Netlify, you must also deploy the backend separately and set `VITE_API_URL` in Netlify to the live API URL.
+
+Netlify also needs an SPA redirect so routes like `/admin/customers` and `/admin/reports` load correctly on refresh. That is handled by `netlify.toml` in this repo.
