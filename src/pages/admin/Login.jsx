@@ -25,7 +25,12 @@ export default function Login() {
         navigate('/admin/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      const message =
+        err.response?.data?.message ||
+        (err.request && !err.response
+          ? 'Cannot reach the API. Check that the site is deployed with Netlify Functions enabled.'
+          : 'Login failed. Please try again.');
+      setError(message);
     } finally {
       setLoading(false);
     }

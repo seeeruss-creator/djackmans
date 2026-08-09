@@ -14,9 +14,20 @@ const DEMO_ADMIN = {
 function isDbConnectionError(err) {
   return (
     err.code === 'ECONNREFUSED' ||
+    err.code === 'ETIMEDOUT' ||
+    err.code === 'ENOTFOUND' ||
     err.code === 'PROTOCOL_CONNECTION_LOST' ||
-    /ECONNREFUSED|connect/i.test(err.message || '')
+    err.code === 'ER_ACCESS_DENIED_ERROR' ||
+    /ECONNREFUSED|connect|ENOTFOUND|ETIMEDOUT/i.test(err.message || '')
   );
+}
+
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not configured on the server.');
+  }
+  return secret;
 }
 
 export const AuthController = {
@@ -39,7 +50,7 @@ export const AuthController = {
 
       const token = jwt.sign(
         { id: user.id, username: user.username, role: user.role, name: user.name },
-        process.env.JWT_SECRET,
+        getJwtSecret(),
         { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
       );
 
@@ -55,7 +66,7 @@ export const AuthController = {
       if (dbDown && req.body?.username === DEMO_ADMIN.username && req.body?.password === 'admin123') {
         const token = jwt.sign(
           { id: DEMO_ADMIN.id, username: DEMO_ADMIN.username, role: DEMO_ADMIN.role, name: DEMO_ADMIN.name },
-          process.env.JWT_SECRET,
+          getJwtSecret(),
           { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
         );
 
@@ -72,11 +83,15 @@ export const AuthController = {
         });
       }
 
+      const configError = /JWT_SECRET is not configured/i.test(err.message || '');
+
       res.status(500).json({
         success: false,
-        message: dbDown
-          ? 'Cannot connect to the database. Please start MySQL, then try again.'
-          : 'Login failed due to a server error. Please try again.',
+        message: configError
+          ? 'Server is missing JWT_SECRET. Add it in Netlify environment variables.'
+          : dbDown
+            ? 'Cannot connect to the database. Check DB settings in Netlify environment variables.'
+            : 'Login failed due to a server error. Please try again.',
       });
     }
   },
