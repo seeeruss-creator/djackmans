@@ -16,8 +16,6 @@ function isDbConnectionError(err) {
     err.code === 'ECONNREFUSED' ||
     err.code === 'ETIMEDOUT' ||
     err.code === 'ENOTFOUND' ||
-    err.code === 'PROTOCOL_CONNECTION_LOST' ||
-    err.code === 'ER_ACCESS_DENIED_ERROR' ||
     /ECONNREFUSED|connect|ENOTFOUND|ETIMEDOUT/i.test(err.message || '')
   );
 }

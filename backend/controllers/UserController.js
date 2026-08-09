@@ -25,7 +25,7 @@ export const UserController = {
       const user = await UserModel.create({ name, username, email, password: hashed, role, status });
       res.status(201).json({ success: true, data: user });
     } catch (err) {
-      if (err.code === 'ER_DUP_ENTRY') {
+      if (err.code === '23505') {
         return res.status(409).json({ success: false, message: 'Username or email already exists.' });
       }
       res.status(500).json({ success: false, message: err.message });
@@ -47,7 +47,7 @@ export const UserController = {
       const user = await UserModel.update(req.params.id, data);
       res.json({ success: true, data: user });
     } catch (err) {
-      if (err.code === 'ER_DUP_ENTRY') {
+      if (err.code === '23505') {
         return res.status(409).json({ success: false, message: 'Username or email already exists.' });
       }
       res.status(500).json({ success: false, message: err.message });
