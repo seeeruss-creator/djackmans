@@ -1,4 +1,7 @@
 import pool from '../config/db.js';
+import { db } from '../../db/index.js';
+import { users } from '../../db/schema.js';
+import { eq, desc } from 'drizzle-orm';
 
 export const CustomerModel = {
   async findAll(search = '') {
@@ -92,50 +95,74 @@ export const CustomerModel = {
 
 export const UserModel = {
   async findAll() {
-    const [rows] = await pool.query(
-      'SELECT id, name, username, email, role, status, created_at, updated_at FROM users ORDER BY created_at DESC'
-    );
-    return rows;
+    return db
+      .select({
+        id: users.id,
+        name: users.name,
+        username: users.username,
+        email: users.email,
+        role: users.role,
+        status: users.status,
+        created_at: users.createdAt,
+        updated_at: users.updatedAt,
+      })
+      .from(users)
+      .orderBy(desc(users.createdAt));
   },
 
   async findById(id) {
-    const [rows] = await pool.query(
-      'SELECT id, name, username, email, role, status, created_at, updated_at FROM users WHERE id = ?',
-      [id]
-    );
-    return rows[0];
+    const [row] = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        username: users.username,
+        email: users.email,
+        role: users.role,
+        status: users.status,
+        created_at: users.createdAt,
+        updated_at: users.updatedAt,
+      })
+      .from(users)
+      .where(eq(users.id, id));
+    return row;
   },
 
   async findByUsername(username) {
-    const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
-    return rows[0];
+    const [row] = await db.select().from(users).where(eq(users.username, username));
+    return row;
   },
 
   async create(data) {
-    const [result] = await pool.query(
-      'INSERT INTO users (name, username, email, password, role, status) VALUES (?, ?, ?, ?, ?, ?)',
-      [data.name, data.username, data.email, data.password, data.role || 'clerk', data.status || 'active']
-    );
-    return this.findById(result.insertId);
+    const [row] = await db
+      .insert(users)
+      .values({
+        name: data.name,
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        role: data.role || 'clerk',
+        status: data.status || 'active',
+      })
+      .returning();
+    return this.findById(row.id);
   },
 
   async update(id, data) {
-    const fields = [];
-    const params = [];
-    if (data.name !== undefined) { fields.push('name = ?'); params.push(data.name); }
-    if (data.username !== undefined) { fields.push('username = ?'); params.push(data.username); }
-    if (data.email !== undefined) { fields.push('email = ?'); params.push(data.email); }
-    if (data.password !== undefined) { fields.push('password = ?'); params.push(data.password); }
-    if (data.role !== undefined) { fields.push('role = ?'); params.push(data.role); }
-    if (data.status !== undefined) { fields.push('status = ?'); params.push(data.status); }
-    if (fields.length === 0) return this.findById(id);
-    params.push(id);
-    await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, params);
+    const values = {};
+    if (data.name !== undefined) values.name = data.name;
+    if (data.username !== undefined) values.username = data.username;
+    if (data.email !== undefined) values.email = data.email;
+    if (data.password !== undefined) values.password = data.password;
+    if (data.role !== undefined) values.role = data.role;
+    if (data.status !== undefined) values.status = data.status;
+    if (Object.keys(values).length === 0) return this.findById(id);
+    values.updatedAt = new Date();
+    await db.update(users).set(values).where(eq(users.id, id));
     return this.findById(id);
   },
 
   async delete(id) {
-    await pool.query('DELETE FROM users WHERE id = ?', [id]);
+    await db.delete(users).where(eq(users.id, id));
   },
 };
 
