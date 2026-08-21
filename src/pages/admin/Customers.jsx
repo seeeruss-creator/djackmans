@@ -198,13 +198,13 @@ export default function Customers() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
+          <h1 className="admin-page-title">Customers</h1>
           <p className="text-sm text-admin-muted mt-0.5">Customer records and order history</p>
         </div>
         <button
           type="button"
           onClick={() => { setEditing(null); setShowForm(true); }}
-          className="bg-admin-primary hover:bg-admin-primary-dark text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
+          className="admin-btn-primary"
         >
           + New Customer
         </button>
@@ -212,7 +212,7 @@ export default function Customers() {
 
       {error && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">{error}</div>}
 
-      <div className="bg-white rounded-xl shadow-admin border border-admin-border">
+      <div className="admin-card">
         <div className="p-4 border-b border-admin-border">
           <input
             type="text"

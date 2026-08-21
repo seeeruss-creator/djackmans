@@ -66,37 +66,37 @@ export default function OrderListPage({
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-          <p className="text-sm text-admin-muted mt-0.5">Manage and update orders</p>
+          <h1 className="admin-page-title">{title}</h1>
+          <p className="admin-page-sub">Manage and update orders</p>
         </div>
         <button
           type="button"
           onClick={() => { setEditingOrder(null); setShowForm(true); }}
-          className="bg-admin-primary hover:bg-admin-primary-dark text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors shadow-sm"
+          className="admin-btn-primary"
         >
           + Add Order
         </button>
       </div>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+        <div className="mb-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm px-4 py-3 rounded-xl">
           {error}
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-admin border border-admin-border">
-        <div className="flex flex-col lg:flex-row gap-3 p-4 border-b border-admin-border">
+      <div className="admin-card overflow-hidden">
+        <div className="flex flex-col lg:flex-row gap-3 p-4 border-b border-admin-border bg-admin-soft/40">
           <input
             type="text"
             placeholder="Search by order #, customer name, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-admin-primary/30 focus:border-admin-primary"
+            className="flex-1 border border-admin-border bg-admin-panel rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-admin-primary/25 focus:border-admin-primary"
           />
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-admin-primary/30"
+            className="border border-admin-border bg-admin-panel rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-admin-primary/25"
           >
             <option value="">All Statuses</option>
             {ORDER_STATUSES.map((s) => (
@@ -106,7 +106,7 @@ export default function OrderListPage({
           <select
             value={paymentStatus}
             onChange={(e) => setPaymentStatus(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-admin-primary/30"
+            className="border border-admin-border bg-admin-panel rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-admin-primary/25"
           >
             <option value="">All Payments</option>
             {PAYMENT_STATUSES.map((s) => (
@@ -118,30 +118,30 @@ export default function OrderListPage({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-admin-border">
+              <tr className="bg-admin-soft/60 border-b border-admin-border">
                 {columns.map((col) => (
-                  <th key={col} className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
+                  <th key={col} className="text-left text-[10px] font-semibold text-admin-muted uppercase tracking-[0.14em] px-4 py-3.5">
                     {col}
                   </th>
                 ))}
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Status</th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Payment</th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Date</th>
-                <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
+                <th className="text-left text-[10px] font-semibold text-admin-muted uppercase tracking-[0.14em] px-4 py-3.5">Status</th>
+                <th className="text-left text-[10px] font-semibold text-admin-muted uppercase tracking-[0.14em] px-4 py-3.5">Payment</th>
+                <th className="text-left text-[10px] font-semibold text-admin-muted uppercase tracking-[0.14em] px-4 py-3.5">Date</th>
+                <th className="text-right text-[10px] font-semibold text-admin-muted uppercase tracking-[0.14em] px-4 py-3.5">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={colSpan} className="text-center text-gray-400 py-12">Loading...</td></tr>
+                <tr><td colSpan={colSpan} className="text-center text-admin-muted py-14">Loading...</td></tr>
               ) : pageOrders.length === 0 ? (
-                <tr><td colSpan={colSpan} className="text-center text-gray-400 py-12">No orders found.</td></tr>
+                <tr><td colSpan={colSpan} className="text-center text-admin-muted py-14">No orders found.</td></tr>
               ) : (
                 pageOrders.map((order) => (
-                  <tr key={order.id} className="border-b border-gray-50 hover:bg-gray-50/80 transition-colors">
+                  <tr key={order.id} className="border-b border-admin-border/70 hover:bg-admin-soft/40 transition-colors">
                     {renderRow(order, { formatMoney })}
                     <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                     <td className="px-4 py-3"><StatusBadge status={order.payment_status} type="payment" /></td>
-                    <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                    <td className="px-4 py-3 text-admin-muted text-xs whitespace-nowrap">
                       {order.created_at ? new Date(order.created_at).toLocaleDateString() : '—'}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -149,14 +149,14 @@ export default function OrderListPage({
                         <button
                           type="button"
                           onClick={() => { setEditingOrder(order); setShowForm(true); }}
-                          className="text-xs text-admin-primary hover:text-admin-primary-dark font-medium"
+                          className="text-xs text-admin-primary hover:text-admin-primary-dark font-semibold"
                         >
                           Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeleteTarget(order)}
-                          className="text-xs text-red-500 hover:text-red-700 font-medium"
+                          className="text-xs text-rose-500 hover:text-rose-700 font-semibold"
                         >
                           Delete
                         </button>

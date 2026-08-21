@@ -66,7 +66,17 @@ export function createApp() {
 
   app.use((err, req, res, next) => {
     console.error(err);
-    res.status(500).json({ success: false, message: 'Internal server error.' });
+    const status = err.status || err.statusCode || 500;
+    if (status === 400 && err.type === 'entity.parse.failed') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid JSON body.',
+      });
+    }
+    res.status(status >= 400 && status < 600 ? status : 500).json({
+      success: false,
+      message: status === 500 ? 'Internal server error.' : err.message || 'Request failed.',
+    });
   });
 
   return app;

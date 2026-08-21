@@ -60,21 +60,21 @@ export default function Reports() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-        <p className="text-sm text-admin-muted mt-1">Order and revenue summary</p>
+        <h1 className="admin-page-title">Reports</h1>
+        <p className="admin-page-sub">Order and revenue summary</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-admin-border shadow-admin p-4 flex flex-col lg:flex-row gap-3 lg:items-end">
+      <div className="admin-card p-4 flex flex-col lg:flex-row gap-3 lg:items-end">
         <div className="flex flex-wrap gap-2">
           {RANGES.map((r) => (
             <button
               key={r.key}
               type="button"
               onClick={() => setRange(r.key)}
-              className={`px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
+              className={`px-3.5 py-2 text-sm rounded-xl font-medium transition-colors ${
                 range === r.key
-                  ? 'bg-admin-primary text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-bronze-gradient text-brand-cream shadow-admin'
+                  : 'bg-admin-soft text-admin-text hover:bg-admin-border/70'
               }`}
             >
               {r.label}
@@ -115,39 +115,39 @@ export default function Reports() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
             {cards.map(({ label, value }) => (
-              <div key={label} className="bg-white rounded-xl border border-admin-border shadow-admin p-4">
-                <div className="text-xs text-admin-muted uppercase tracking-wide mb-1">{label}</div>
-                <div className="text-xl font-bold text-gray-900">{value}</div>
+              <div key={label} className="admin-card p-4">
+                <div className="text-[10px] text-admin-muted uppercase tracking-[0.14em] mb-2 font-semibold">{label}</div>
+                <div className="font-serif text-2xl font-semibold text-admin-text">{value}</div>
               </div>
             ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl border border-admin-border shadow-admin p-5">
-              <h2 className="text-base font-semibold text-gray-900 mb-4">By Service</h2>
+            <div className="admin-card p-5">
+              <h2 className="font-serif text-lg font-semibold text-admin-text mb-4">By Service</h2>
               <ul className="space-y-3">
                 {Object.entries(data.ordersByServiceType || {}).map(([key, count]) => (
-                  <li key={key} className="flex justify-between text-sm border-b border-gray-50 pb-2">
-                    <span className="text-gray-700">{SERVICE_LABELS[key] || key}</span>
-                    <span className="font-semibold text-gray-900">{count}</span>
+                  <li key={key} className="flex justify-between text-sm border-b border-admin-border pb-2">
+                    <span className="text-admin-text/80">{SERVICE_LABELS[key] || key}</span>
+                    <span className="font-semibold text-admin-text">{count}</span>
                   </li>
                 ))}
                 {!Object.keys(data.ordersByServiceType || {}).length && (
-                  <li className="text-sm text-gray-400">No data</li>
+                  <li className="text-sm text-admin-muted">No data</li>
                 )}
               </ul>
             </div>
-            <div className="bg-white rounded-xl border border-admin-border shadow-admin p-5">
-              <h2 className="text-base font-semibold text-gray-900 mb-4">By Status</h2>
+            <div className="admin-card p-5">
+              <h2 className="font-serif text-lg font-semibold text-admin-text mb-4">By Status</h2>
               <ul className="space-y-3">
                 {Object.entries(data.ordersByStatus || {}).map(([key, count]) => (
-                  <li key={key} className="flex justify-between text-sm border-b border-gray-50 pb-2">
-                    <span className="text-gray-700">{STATUS_LABELS[key] || key.replace(/_/g, ' ')}</span>
-                    <span className="font-semibold text-gray-900">{count}</span>
+                  <li key={key} className="flex justify-between text-sm border-b border-admin-border pb-2">
+                    <span className="text-admin-text/80">{STATUS_LABELS[key] || key.replace(/_/g, ' ')}</span>
+                    <span className="font-semibold text-admin-text">{count}</span>
                   </li>
                 ))}
                 {!Object.keys(data.ordersByStatus || {}).length && (
-                  <li className="text-sm text-gray-400">No data</li>
+                  <li className="text-sm text-admin-muted">No data</li>
                 )}
               </ul>
             </div>

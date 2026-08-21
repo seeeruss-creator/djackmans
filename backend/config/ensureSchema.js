@@ -155,26 +155,6 @@ async function ensureAdminUser() {
   console.log('Bootstrapped default admin user (admin / admin123)');
 }
 
-/** Reset or create the default admin so admin / admin123 always works. */
-export async function resetDefaultAdminPassword() {
-  const hashed = await bcrypt.hash('admin123', 10);
-  const [existing] = await pool.query('SELECT id FROM users WHERE username = ? LIMIT 1', ['admin']);
-
-  if (existing.length === 0) {
-    await pool.query(
-      `INSERT INTO users (name, username, email, password, role, status)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      ['Admin User', 'admin', 'admin@djackman.com', hashed, 'admin', 'active']
-    );
-    return;
-  }
-
-  await pool.query(
-    `UPDATE users SET password = ?, status = 'active', role = 'admin' WHERE username = ?`,
-    [hashed, 'admin']
-  );
-}
-
 async function runEnsure() {
   if (isPostgres) {
     for (const statement of PG_STATEMENTS) {
@@ -193,8 +173,9 @@ async function runEnsure() {
 }
 
 /**
- * Creates tables (Postgres) and ensures admin/admin123 exists.
+ * Creates tables (Postgres) and seeds admin only if missing.
  * Safe to call on every request; runs once per cold start.
+ * Does not reset an existing admin password.
  */
 export function ensureDatabaseReady() {
   if (!readyPromise) {

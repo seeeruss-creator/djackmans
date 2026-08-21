@@ -1,18 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { UserModel } from '../models/index.js';
-import { ensureDatabaseReady, resetDefaultAdminPassword } from '../config/ensureSchema.js';
-
-const DEMO_ADMIN = {
-  id: 1,
-  name: 'Admin User',
-  username: 'admin',
-  email: 'admin@djackman.com',
-  role: 'admin',
-  status: 'active',
-};
-
-const DEFAULT_PASSWORD = 'admin123';
+import { ensureDatabaseReady } from '../config/ensureSchema.js';
+import { getJwtSecret } from '../middleware/auth.js';
 
 function isDbConnectionError(err) {
   return (
@@ -26,21 +16,6 @@ function isDbConnectionError(err) {
     /ECONNREFUSED|connect|ENOTFOUND|ETIMEDOUT|password authentication|does not exist/i.test(
       err.message || ''
     )
-  );
-}
-
-function getJwtSecret() {
-  const secret = process.env.JWT_SECRET || process.env.NETLIFY_JWT_SECRET;
-  if (secret) return secret;
-  console.warn('JWT_SECRET is not set — using a temporary fallback. Set JWT_SECRET in Netlify env vars.');
-  return 'djackman-temporary-jwt-secret-set-JWT_SECRET';
-}
-
-function isDefaultAdminLogin(username, password) {
-  const id = String(username || '').trim().toLowerCase();
-  return (
-    password === DEFAULT_PASSWORD &&
-    (id === DEMO_ADMIN.username || id === DEMO_ADMIN.email)
   );
 }
 
@@ -87,29 +62,16 @@ export const AuthController = {
         await withTimeout(ensureDatabaseReady(), 12000, 'Database bootstrap');
       } catch (bootErr) {
         console.error('Database bootstrap failed:', bootErr.message);
-        if (isDefaultAdminLogin(username, password)) {
-          return res.json(issueToken(DEMO_ADMIN));
-        }
         if (isDbConnectionError(bootErr)) {
           return res.status(500).json({
             success: false,
-            message:
-              'Cannot connect to the database. On Netlify, enable Netlify Database / Neon and ensure NETLIFY_DATABASE_URL or NETLIFY_DB_URL is set.',
+            message: 'Cannot connect to the database. Check your database settings.',
           });
         }
         throw bootErr;
       }
 
-      let user = await UserModel.findByUsernameOrEmail(username);
-
-      // Default credentials always work: repair a missing/wrong admin password.
-      if (isDefaultAdminLogin(username, password)) {
-        if (!user || !(await bcrypt.compare(password, user.password)) || user.status !== 'active') {
-          await resetDefaultAdminPassword();
-          user = await UserModel.findByUsernameOrEmail('admin');
-        }
-      }
-
+      const user = await UserModel.findByUsernameOrEmail(username);
       if (!user || user.status !== 'active') {
         return res.status(401).json({ success: false, message: 'Invalid credentials.' });
       }
@@ -122,16 +84,11 @@ export const AuthController = {
       return res.json(issueToken(user));
     } catch (err) {
       console.error('Login error:', err.message);
-
-      if (isDefaultAdminLogin(username, password)) {
-        return res.json(issueToken(DEMO_ADMIN));
-      }
-
       const dbDown = isDbConnectionError(err);
       res.status(500).json({
         success: false,
         message: dbDown
-          ? 'Cannot connect to the database. Check DB settings in Netlify environment variables.'
+          ? 'Cannot connect to the database. Check your database settings.'
           : 'Login failed due to a server error. Please try again.',
       });
     }
@@ -142,16 +99,56 @@ export const AuthController = {
       await ensureDatabaseReady();
       const user = await UserModel.findById(req.user.id);
       if (!user) {
-        if (req.user?.username === DEMO_ADMIN.username) {
-          return res.json({ success: true, user: DEMO_ADMIN });
-        }
         return res.status(404).json({ success: false, message: 'User not found.' });
       }
       res.json({ success: true, user });
     } catch (err) {
-      if (isDbConnectionError(err) && req.user?.username === DEMO_ADMIN.username) {
-        return res.json({ success: true, user: DEMO_ADMIN });
+      res.status(500).json({ success: false, message: err.message });
+    }
+  },
+
+  async changePassword(req, res) {
+    try {
+      const { currentPassword, newPassword } = req.body || {};
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Current password and new password are required.',
+        });
       }
+      if (String(newPassword).length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: 'New password must be at least 6 characters.',
+        });
+      }
+      if (currentPassword === newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'New password must be different from the current password.',
+        });
+      }
+
+      await ensureDatabaseReady();
+      const user = await UserModel.findByUsername(req.user.username);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found.' });
+      }
+
+      const valid = await bcrypt.compare(currentPassword, user.password);
+      if (!valid) {
+        return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
+      }
+
+      const hashed = await bcrypt.hash(newPassword, 10);
+      await UserModel.update(user.id, { password: hashed });
+
+      res.json({
+        success: true,
+        message: 'Password updated successfully. Use your new password next time you sign in.',
+      });
+    } catch (err) {
+      console.error('Change password error:', err.message);
       res.status(500).json({ success: false, message: err.message });
     }
   },

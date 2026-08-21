@@ -11,6 +11,68 @@
   }
 }
 
+@layer components {
+  .admin-card {
+    background-color: #fffcf7;
+    border-radius: 1rem;
+    border: 1px solid #e5dcce;
+    box-shadow: 0 1px 2px rgba(26, 22, 19, 0.04), 0 8px 24px rgba(26, 22, 19, 0.06);
+  }
+  .admin-page-title {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 600;
+    color: #1a1613;
+    letter-spacing: -0.025em;
+  }
+  @media (min-width: 640px) {
+    .admin-page-title {
+      font-size: 1.875rem;
+      line-height: 2.25rem;
+    }
+  }
+  .admin-page-sub {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: #7a7166;
+  }
+  .admin-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-image: linear-gradient(135deg, #8c5a2b 0%, #b97a3c 50%, #c9a15a 100%);
+    color: #f7f1e4;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: opacity 0.15s ease;
+  }
+  .admin-btn-primary:hover {
+    opacity: 0.9;
+  }
+  .admin-btn-primary:disabled {
+    opacity: 0.5;
+  }
+  .admin-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3ebdd;
+    color: #1a1613;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: background-color 0.15s ease;
+  }
+  .admin-btn-ghost:hover {
+    background-color: rgba(229, 220, 206, 0.7);
+  }
+}
+
 @layer utilities {
   .text-gold-gradient {
     background: linear-gradient(135deg, #C9A15A 0%, #E8C47A 60%, #C9A15A 100%);
@@ -35,25 +97,25 @@
     @apply text-brand-gold tracking-[0.25em] uppercase text-xs font-sans font-medium;
   }
 
-  /* Order statuses */
-  .status-received { @apply bg-sky-100 text-sky-800; }
-  .status-in_progress { @apply bg-indigo-100 text-indigo-800; }
-  .status-ready_for_pickup { @apply bg-violet-100 text-violet-800; }
-  .status-completed { @apply bg-emerald-100 text-emerald-800; }
-  .status-cancelled { @apply bg-red-100 text-red-700; }
+  /* Order statuses — warm luxury palette */
+  .status-received { @apply bg-stone-100 text-stone-700; }
+  .status-in_progress { @apply bg-amber-50 text-amber-900; }
+  .status-ready_for_pickup { @apply bg-yellow-50 text-yellow-900; }
+  .status-completed { @apply bg-emerald-50 text-emerald-800; }
+  .status-cancelled { @apply bg-rose-50 text-rose-700; }
 
   /* Payment statuses */
-  .status-unpaid { @apply bg-rose-100 text-rose-800; }
-  .status-partially_paid { @apply bg-amber-100 text-amber-800; }
-  .status-paid { @apply bg-green-100 text-green-800; }
+  .status-unpaid { @apply bg-rose-50 text-rose-800; }
+  .status-partially_paid { @apply bg-amber-50 text-amber-800; }
+  .status-paid { @apply bg-emerald-50 text-emerald-800; }
 
   /* Delivery statuses */
-  .status-pending { @apply bg-slate-100 text-slate-700; }
-  .status-ready { @apply bg-blue-100 text-blue-800; }
-  .status-delivered { @apply bg-teal-100 text-teal-800; }
+  .status-pending { @apply bg-stone-100 text-stone-600; }
+  .status-ready { @apply bg-sky-50 text-sky-800; }
+  .status-delivered { @apply bg-teal-50 text-teal-800; }
 
   /* Legacy aliases */
-  .status-ready_to_pickup { @apply bg-violet-100 text-violet-800; }
-  .status-rented { @apply bg-indigo-100 text-indigo-800; }
-  .status-returned { @apply bg-emerald-100 text-emerald-800; }
+  .status-ready_to_pickup { @apply bg-yellow-50 text-yellow-900; }
+  .status-rented { @apply bg-amber-50 text-amber-900; }
+  .status-returned { @apply bg-emerald-50 text-emerald-800; }
 }
