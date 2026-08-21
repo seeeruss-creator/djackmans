@@ -167,7 +167,7 @@ Frontend runs on `http://localhost:5173`.
 ## Tech Stack
 
 - **Frontend:** React 19, Vite 8, React Router 7, Tailwind CSS 3, Axios
-- **Backend:** Node.js, Express, MySQL2, JWT, bcryptjs
+- **Backend:** Node.js, Express, MySQL2 or Postgres (Netlify/Neon), JWT, bcryptjs
 - **Fonts:** Playfair Display (serif display), Inter (sans)
 
 ## Deployment Notes (Netlify)
@@ -177,6 +177,7 @@ This repo deploys **both the React frontend and Express API on one Netlify site*
 - Frontend is built to `dist/`
 - Backend runs as a Netlify Function at `/.netlify/functions/api`
 - `/api/*` requests are rewritten to that function via `netlify.toml`
+- On first API request the app creates tables (Postgres) and ensures admin `admin` / `admin123` exists
 
 ### Required Netlify environment variables
 
@@ -184,16 +185,11 @@ In **Site settings → Environment variables**, add:
 
 | Variable | Example | Notes |
 |----------|---------|-------|
-| `JWT_SECRET` | `a_long_random_string` | **Required** for login |
-| `DB_HOST` | your-db-host.com | Remote MySQL host |
-| `DB_PORT` | `3306` | Optional |
-| `DB_USER` | `root` | MySQL user |
-| `DB_PASSWORD` | `yourpassword` | MySQL password |
-| `DB_NAME` | `tailoring_management` | Database name |
-| `DB_SSL` | `true` | Set for most cloud MySQL hosts |
+| `JWT_SECRET` | `a_long_random_string` | Recommended for login tokens |
+| `NETLIFY_DATABASE_URL` or `NETLIFY_DB_URL` | `postgresql://...` | **Preferred** — Netlify Postgres / Neon (auto-set when DB is enabled) |
 
-Netlify cannot run a local MySQL server. Use a hosted MySQL provider (Railway, PlanetScale, Aiven, etc.), run migrations/seeds against that database, then set the variables above.
+If you use an external MySQL database instead, set `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (and usually `DB_SSL=true`). Do not mix MySQL and Postgres vars for the same deploy — a Postgres URL takes priority.
 
-If the database is unreachable, login still works with the demo account **`admin` / `admin123`** as long as `JWT_SECRET` is set.
+Login credentials after deploy: **`admin` / `admin123`**
 
 After changing environment variables, trigger a new deploy in Netlify.

@@ -27,7 +27,7 @@ export const CustomerModel = {
       );
       return this.findById(result.insertId);
     } catch (err) {
-      if (err.code === 'ER_BAD_FIELD_ERROR') {
+      if (err.code === 'ER_BAD_FIELD_ERROR' || err.code === '42703') {
         const [result] = await pool.query(
           'INSERT INTO customers (name, phone, email, address) VALUES (?, ?, ?, ?)',
           [data.name, data.phone, data.email || null, data.address || null]
@@ -45,7 +45,7 @@ export const CustomerModel = {
         [data.name, data.phone, data.email || null, data.address || null, data.notes || null, id]
       );
     } catch (err) {
-      if (err.code === 'ER_BAD_FIELD_ERROR') {
+      if (err.code === 'ER_BAD_FIELD_ERROR' || err.code === '42703') {
         await pool.query(
           'UPDATE customers SET name = ?, phone = ?, email = ?, address = ? WHERE id = ?',
           [data.name, data.phone, data.email || null, data.address || null, id]
@@ -108,6 +108,15 @@ export const UserModel = {
 
   async findByUsername(username) {
     const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+    return rows[0];
+  },
+
+  async findByUsernameOrEmail(identifier) {
+    const value = String(identifier || '').trim();
+    const [rows] = await pool.query(
+      'SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1',
+      [value, value]
+    );
     return rows[0];
   },
 

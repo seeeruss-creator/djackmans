@@ -14,9 +14,16 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const status = err.response?.status;
+    const url = String(err.config?.url || '');
+    const isLoginRequest = url.includes('/auth/login');
+
+    // Never redirect away from a failed login attempt — show the error instead.
+    if (status === 401 && !isLoginRequest) {
       logout();
-      window.location.href = '/admin/login';
+      if (!window.location.pathname.includes('/admin/login')) {
+        window.location.href = '/admin/login';
+      }
     }
     return Promise.reject(err);
   }

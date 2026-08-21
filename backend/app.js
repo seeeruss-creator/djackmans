@@ -10,6 +10,8 @@ import { RentOrderController } from './controllers/RentOrderController.js';
 import { CustomizationOrderController } from './controllers/CustomizationOrderController.js';
 import { RepairOrderController } from './controllers/RepairOrderController.js';
 import { DryCleaningOrderController } from './controllers/DryCleaningOrderController.js';
+import { ensureDatabaseReady } from './config/ensureSchema.js';
+import { isPostgres } from './config/db.js';
 
 dotenv.config();
 
@@ -27,7 +29,31 @@ export function createApp() {
     next();
   });
 
-  app.get('/api/health', (req, res) => res.json({ success: true, message: 'API is running' }));
+  // Warm schema / default admin on cold start (non-blocking).
+  // Skip auto-bootstrap when using local MySQL without an explicit DB config —
+  // otherwise cold starts hang waiting for a missing MySQL server.
+  const shouldBootstrap =
+    isPostgres ||
+    Boolean(process.env.DB_HOST || process.env.DB_USER || process.env.DB_NAME);
+  if (shouldBootstrap) {
+    ensureDatabaseReady().catch((err) => {
+      console.error('Startup DB ensure failed:', err.message);
+    });
+  }
+
+  app.get('/api/health', async (req, res) => {
+    let db = isPostgres ? 'postgres' : 'mysql';
+    if (shouldBootstrap) {
+      try {
+        await ensureDatabaseReady();
+      } catch (err) {
+        db = `error: ${err.message}`;
+      }
+    } else {
+      db = 'mysql (not configured)';
+    }
+    res.json({ success: true, message: 'API is running', db });
+  });
 
   app.use('/api/auth', authRoutes);
   app.use('/api/customers', customerRoutes);

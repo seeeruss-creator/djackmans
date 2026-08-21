@@ -18,7 +18,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const res = await AuthApi.login(form.username, form.password);
+      const res = await AuthApi.login(form.username.trim(), form.password);
       if (res.data.success) {
         setToken(res.data.token);
         setUser(res.data.user);
@@ -100,6 +100,9 @@ export default function Login() {
           </form>
 
           <p className="text-center text-xs text-admin-muted mt-6">
+            Default login: <span className="font-medium text-gray-700">admin</span> / <span className="font-medium text-gray-700">admin123</span>
+          </p>
+          <p className="text-center text-xs text-admin-muted mt-2">
             <Link to="/" className="text-admin-primary hover:underline">Back to website</Link>
           </p>
         </div>
