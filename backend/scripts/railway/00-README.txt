@@ -1,0 +1,2 @@
+-- Railway MySQL: run ONE file at a time in Console (not all at once).
+-- Order: 01 → 02 → 03 → 04 → 05 → 06 → 07

@@ -1,0 +1,11 @@
+-- IMPORTANT: Railway Console runs ONE statement at a time.
+-- Do NOT paste this whole file. Use the files in backend/scripts/railway/ instead:
+--   01-customers.sql
+--   02-users.sql
+--   03-rent_orders.sql
+--   04-customization_orders.sql
+--   05-repair_orders.sql
+--   06-drycleaning_orders.sql
+--   07-seed-admin.sql
+--
+-- Run each file separately in Railway -> MySQL -> Database -> Console.

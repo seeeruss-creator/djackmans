@@ -1,0 +1,7 @@
+[build]
+buildCommand = "npm install --prefix backend"
+
+[deploy]
+startCommand = "node backend/server.js"
+healthcheckPath = "/api/health"
+restartPolicyType = "ON_FAILURE"
