@@ -14,7 +14,7 @@ import { CustomizationOrderController } from './controllers/CustomizationOrderCo
 import { RepairOrderController } from './controllers/RepairOrderController.js';
 import { DryCleaningOrderController } from './controllers/DryCleaningOrderController.js';
 import { ensureDatabaseReady } from './config/ensureSchema.js';
-import { isPostgres, isMysqlConfigured } from './config/db.js';
+import pool, { isPostgres, isMysqlConfigured } from './config/db.js';
 
 dotenv.config();
 
@@ -48,11 +48,20 @@ export function createApp() {
     });
   }
 
+  app.get('/', (req, res) => {
+    res.json({ success: true, message: 'D Jackman API is running' });
+  });
+
   app.get('/api/health', async (req, res) => {
     let db = isPostgres ? 'postgres' : 'mysql';
     if (shouldBootstrap) {
       try {
-        await ensureDatabaseReady();
+        await Promise.race([
+          pool.query('SELECT 1'),
+          new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Database ping timed out')), 4000);
+          }),
+        ]);
       } catch (err) {
         db = `error: ${err.message}`;
       }

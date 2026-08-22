@@ -119,3 +119,41 @@ JWT_EXPIRES_IN=24h
 | `admin` | `admin123` |
 
 Change password in Settings after first login.
+
+---
+
+## Troubleshooting: "Application failed to respond"
+
+This usually means Railway could not reach your server. Check these in order:
+
+### 1. Root Directory must be `backend`
+Service → **Settings** → **Root Directory** → `backend`  
+If this is wrong, the start command will fail.
+
+### 2. MySQL variables must be linked
+Service → **Variables** — you need all five `${{MySQL.*}}` references:
+`MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD`, `MYSQLDATABASE`
+
+Also add: `DB_SSL` = `false`
+
+Do **not** use `altaria.proxy.rlwy.net:22496` on the backend service.
+
+### 3. Check Deploy Logs
+Service → **Deployments** → latest → **View Logs**
+
+Look for:
+- `Server running on http://0.0.0.0:XXXX` → good, server started
+- `ECONNREFUSED` / `ETIMEDOUT` → MySQL vars wrong or not linked
+- `Cannot find module` → Root Directory not set to `backend`
+
+### 4. Test after deploy
+```
+https://YOUR-BACKEND.up.railway.app/
+https://YOUR-BACKEND.up.railway.app/api/health
+```
+
+`/` should respond instantly.  
+`/api/health` shows db status — `"db": "mysql"` means DB connected.
+
+### 5. Redeploy after fixing variables
+Variables → Save → **Redeploy** the service.
